@@ -26,34 +26,110 @@ h$M05[h$M05 %in% c(4.5)] <- 5; table(h$M05)
 h$E04[h$E04 %in% c(6.5)] <- 7; table(h$E04)
 h$III.9.8[h$III.9.8 %in% c(4)] <- 0; table(h$III.9.8)
 
-sort(rowSums(is.na(h)))
-h30 <- h[which(rowSums(is.na(h)) < 30), ]
+#Questionnaire partioning
+h1 <- h[c(1:18)]
+h2 <- h[c(19:53)]
+h3 <- h[c(54:74)]
 
 #Total Null Values
-sum(is.na(h))
+sum(is.na(h1)); sum(is.na(h2)); sum(is.na(h3))
 
 #h Dimensions
-dim(h)
+dim(h1); dim(h2); dim(h3)
 
-#Check Number of missing values in the each row --Have to think about this
-length(which(rowSums(is.na(h))*100/80 > 14))
+sort(rowSums(is.na(h1)))
+sort(rowSums(is.na(h2)))
+sort(rowSums(is.na(h3)))
 
-#removing the Rows with greater than 30 missing values
-h <- h[which(rowSums(is.na(h)) < 30), ]
-
-#Number of missing values in each row
+#Number of missing values in each column
 NAcol <- which(colSums(is.na(h)) > 0);NAcol
 sort(colSums(sapply(h[NAcol], is.na)), decreasing = TRUE)
 
-#Replacing the missing values with 0 becaue those homes don't have Hybrid car
-#4 value is out of range, will replace that with 0 as well because most of the homes don't have Hybrid car
+#Part 3 Missing Values Replacement based on the sorting results
+#Replacing the NA from III.9.1 to III.9.8 with 0
+table(h$III.9.1)
+h$III.9.1 <- ifelse(is.na(h$III.9.1), 0, h$III.9.1)
+table(h$III.9.2)
+h$III.9.2 <- ifelse(is.na(h$III.9.2), 0, h$III.9.2)
+table(h$III.9.3)
+h$III.9.3 <- ifelse(is.na(h$III.9.3), 0, h$III.9.3)
+table(h$III.9.4)
+h$III.9.4 <- ifelse(is.na(h$III.9.4), 0, h$III.9.4)
+table(h$III.9.5)
+h$III.9.5 <- ifelse(is.na(h$III.9.5), 0, h$III.9.5)
+table(h$III.9.6)
+h$III.9.6 <- ifelse(is.na(h$III.9.6), 0, h$III.9.6)
+table(h$III.9.7)
+h$III.9.7 <- ifelse(is.na(h$III.9.7), 0, h$III.9.7)
 table(h$III.9.8)
 h$III.9.8 <- ifelse(is.na(h$III.9.8), 0, h$III.9.8)
-h$III.9.8 <- ifelse(h$III.9.8 != 1, 0, h$III.9.8)
+#h$III.9.8 <- ifelse(h$III.9.8 != 1, 0, h$III.9.8)
 
-#Replacing the NA in flights with 0 becasue NA mean people haven't take any flight this year
+#Replacing the NA in flights with 0
 table(h$flights)
 h$flights <- ifelse(is.na(h$flights), 0, h$flights)
 
-h$X <- NULL
-str(h)
+#Replacing the NA in water with mean
+summary(h$water)
+#mean = 212
+h$water <- ifelse(is.na(h$water), 212, h$water)
+summary(h$water)
+
+#Replacing the NA in income with mean 
+summary(h$income)
+#mean = 25
+h$income <- ifelse(is.na(h$income), 25, h$income)
+summary(h$income)
+
+#Replacing the NA in petrol with mean 
+summary(h$petrol)
+#mean = 552
+h$petrol <- ifelse(is.na(h$petrol), 552, h$petrol)
+summary(h$petrol)
+
+#Replacing the NA in children with 0 
+table(h$children)
+h$children <- ifelse(is.na(h$children), 0, h$children)
+table(h$children)
+
+#Replacing the NA in transport with mode
+table(h$transport)
+#mode = 4
+h$transport <- ifelse(is.na(h$transport), 4, h$transport)
+table(h$transport)
+
+#Replacing the NA in age with mean
+summary(h$age)
+#mean = 34
+h$age <- ifelse(is.na(h$age), 34, h$age)
+summary(h$age)
+
+#Replacing the NA in job with mode
+table(h$job)
+#mode = 1
+h$job <- ifelse(is.na(h$job), 1, h$job)
+table(h$job)
+
+#Replacing the NA in home with mode
+table(h$home)
+#mode = 2
+h$home <- ifelse(is.na(h$home), 2, h$home)
+table(h$home)
+
+#Replacing the NA in edu with mode
+table(h$edu)
+#mode = 4
+h$edu <- ifelse(is.na(h$edu), 4, h$edu)
+table(h$edu)
+
+#Replacing the NA in adult with mode
+table(h$adult)
+#mode = 4
+h$adult <- ifelse(is.na(h$adult), 4, h$adult)
+table(h$adult)
+
+#Replacing the NA in sex with mode
+table(h$sex)
+#mode = 1
+h$sex <- ifelse(is.na(h$sex), 1, h$sex)
+table(h$sex)
