@@ -36,7 +36,18 @@ allcolumns = cbind(replaced, nocolumn)
 allrows = rbind(allcolumns, nopeople)
 summary(allrows)
 
+missing1 = apply(allrows, 1, percentmiss)
+table(missing1)
+missing2 = apply(allrows, 2, percentmiss)
+table(missing2)
 
+sum(is.na(allrows[19:53]))
+
+miss1 = apply(x[ ,c(1:18)], 1, percentmiss)
+table(miss1)
+
+miss2 = apply(x[ ,c(19:53)], 1, percentmiss)
+table(miss2)
 
 #ignore below
 View(h[ , -c(1:2)])
