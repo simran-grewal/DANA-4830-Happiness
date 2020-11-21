@@ -1,6 +1,10 @@
 library(haven)
 library(ggplot2)
 library(dplyr)
+library(GPArotation)
+library(stats)
+library(psych)
+library(factonal)
 
 data <- read.csv('./Documents/Dimentionality Reduction/Group Project/Happiness-Sustainable-Behaviour.csv')
 data$X <- NULL
@@ -59,19 +63,29 @@ data[c(Not_attempted_q9),"income"]
 table(data$income)
 
 
-#Number of missing values per row   
-sort(rowSums(is.na(data[,c(3:55)])), decreasing = T)
-
-
-#%age of missing values per row
-sort((rowSums(is.na(data[,c(3:55)]))*100)/53, decreasing = T)
+# #Number of missing values per row   
+# sort(rowSums(is.na(data[,3:55])), decreasing = T)
+# 
+# 
+# #%age of missing values per row
+# sort((rowSums(is.na(data[,c(3:55)]))*100)/53, decreasing = T)
 
 
 #Removing SC_10 column because of unclear question and a lot of missing values
 data$SC_10 <- NULL
 
+#Columns 21 to 54 belongs to part2 questions
+###Replacing missing values in the part2 questions with the nutral value
+data[21:54] <- lapply(data[21:54], function(X) {
+  X <- ifelse(is.na(X), 4, X)
+  return(X)
+})
 
-#Repace missing values for each column in part 1 and part 2 with maximum repeated values
+#So, No NAs in part 2 questions
+sum(is.na(data[21:54]))
+
+
+#Repace missing values for each column in part 1 with maximum repeated values
 replace_with_max_value <- function(x) {
   ux <- unique(x)
   return(ux[which.max(tabulate(match(x, ux)))])
@@ -82,10 +96,15 @@ getEachColumn <- function(X) {
   return(X)
 }
 
+##Part2 values are already replaces
 data[,c(3:54)] <- lapply(data[3:54], getEachColumn)
 
 #No missing values for part 1 and part 2
 sum(is.na(data[,c(3:54)]))
+
+
+
+
 
 
 #Checking out of range values
@@ -100,19 +119,43 @@ outOfRage <- lapply(data[3:54], function(X) {
 #Column M05 and E04 have out of range values
 names(which(outOfRage == 1))
 
+table(data$M05);table(data$E04)
+
+data$M05 <- ifelse(data$M05 == 4.5, 5, data$M05)
+
+data$E04 <- ifelse(data$E04 == 6.5, 6, data$E04)
 
 
-#Part 3
+#Outlier
+#Mahalanobis distance
+distances <-
+  mahalanobis(
+    x = data[3:54],
+    center = colMeans(data[3:54]) ,
+    cov = cov(data[3:54])
+  )
 
-#Transport
-table(data$transport)
 
-sum(is.na(data$transport))
 
-data[which(!is.na(data$income) & !is.na(data$transport)), ] %>%
-  ggplot(aes(x = as.factor(transport), y = income, color = as.factor(transport))) +
-  geom_boxplot() + 
-  geom_jitter(alpha = 0.3)
+cutoff <-
+  qchisq(p = 0.999 , df = ncol(data[3:54]))
+cat("cutoff = ", cutoff)
+cat("Number of outliers = ", dim(data[3:54][distances > cutoff, ])[1])
+
+data <- data[distances < cutoff, ]
+cat("Number of rows left after removing outliers = ", dim(data)[1])
+
+
+
+
+#FA
+nofactors = fa.parallel(data[3:54], fm="ml", fa="fa")
+nofactors$fa.values#eigen values
+
+EFA.model.two <- fa(data[3:54], nfactors=3, rotate = "oblimin", fm = "ml")
+fa.diagram(EFA.model.two)
+
+
 
 
 
