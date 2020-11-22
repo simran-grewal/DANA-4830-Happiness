@@ -239,15 +239,15 @@ psych::alpha(data[ , f2p1])
 #part2
 #efa2new <- data[, c(21:48,50:54)]
 names(efa2new)
-f1p2 = c()
-f2p2 = c()
-f3p2 = c()
+f1p2 = c(25:28, 46, 48, 51:54)
+f2p2 = c(40:45, 47)
+f3p2 = c(21:24, 29:39, 50)
 psych::alpha(data[ , f1p2])
-#raw alpha of factor 1: 
+#raw alpha of factor 1: 0.9
 psych::alpha(data[ , f2p2])
-#raw alpha of factor 2: 
+#raw alpha of factor 2: 0.83
 psych::alpha(data[ , f3p2])
-#raw alpha of factor 3: 
+#raw alpha of factor 3: 0.9
 
 
 
