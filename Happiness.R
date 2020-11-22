@@ -4,7 +4,7 @@ library(dplyr)
 library(GPArotation)
 library(stats)
 library(psych)
-library(factonal)
+library("factoextra")
 
 data <- read.csv('./Documents/Dimentionality Reduction/Group Project/Happiness-Sustainable-Behaviour.csv')
 data$X <- NULL
@@ -20,16 +20,6 @@ dim(data)
 table(data$III.9.8)
 
 
-#Check Number of missing values in the each row --Have to think about this
-# length(which(rowSums(is.na(data))*100/80 > 14))
-
-#removing the Rows with greater than 30 missing values
-# data <- data[which(rowSums(is.na(data)) < 30), ]
-# 
-
-
-
-
 #Number of missing values in each row
 NAcol <- which(colSums(is.na(data)) > 0);NAcol
 sort(colSums(sapply(data[NAcol], is.na)), decreasing = TRUE)
@@ -40,7 +30,7 @@ table(data$III.9.8)
 data$III.9.8 <- ifelse(is.na(data$III.9.8), 0, data$III.9.8)
 data$III.9.8 <- ifelse(data$III.9.8 != 1, 0, data$III.9.8)
 
-#Replacing the NA in flights with 0 becasue NA, means people haven't taken any flight this year
+#Replacing the NA in flights with 0 becasue NAs means people haven't taken any flight this year
 table(data$flights)
 data$flights <- ifelse(is.na(data$flights), 0, data$flights)
 
@@ -63,16 +53,13 @@ data[c(Not_attempted_q9),"income"]
 table(data$income)
 
 
-# #Number of missing values per row   
-# sort(rowSums(is.na(data[,3:55])), decreasing = T)
-# 
-# 
-# #%age of missing values per row
-# sort((rowSums(is.na(data[,c(3:55)]))*100)/53, decreasing = T)
-
-
 #Removing SC_10 column because of unclear question and a lot of missing values
 data$SC_10 <- NULL
+
+
+#Number of missing values per row for part 1 and part 2 quiz only
+sort(rowSums(is.na(data[,3:54])), decreasing = T)
+
 
 #Columns 21 to 54 belongs to part2 questions
 ###Replacing missing values in the part2 questions with the nutral value
@@ -104,9 +91,6 @@ sum(is.na(data[,c(3:54)]))
 
 
 
-
-
-
 #Checking out of range values
 outOfRage <- lapply(data[3:54], function(X) {
   outOfRange <- ifelse(!X %in% c(1:7), 'YES', 'NO')
@@ -126,34 +110,86 @@ data$M05 <- ifelse(data$M05 == 4.5, 5, data$M05)
 data$E04 <- ifelse(data$E04 == 6.5, 6, data$E04)
 
 
-#Outlier
+################Removing Outliers#######################
+
+#Part 1
 #Mahalanobis distance
 distances <-
-  mahalanobis(
-    x = data[3:54],
-    center = colMeans(data[3:54]) ,
-    cov = cov(data[3:54])
-  )
-
-
-
+  mahalanobis(x = data[3:20],
+              center = colMeans(data[3:20]) ,
+              cov = cov(data[3:20]))
 cutoff <-
-  qchisq(p = 0.999 , df = ncol(data[3:54]))
+  qchisq(0.999, ncol(data[3:20]))
 cat("cutoff = ", cutoff)
-cat("Number of outliers = ", dim(data[3:54][distances > cutoff, ])[1])
+cat("Number of outliers = ", dim(data[3:20][distances > cutoff, ])[1])
 
 data <- data[distances < cutoff, ]
-cat("Number of rows left after removing outliers = ", dim(data)[1])
+cat("Number of rows left after removing outliers = ", dim(data)[1], " ")
+
+#Part 2
+#Mahalanobis distance
+distances <-
+  mahalanobis(x = data[21:54],
+              center = colMeans(data[21:54]) ,
+              cov = cov(data[21:54]))
+cutoff <-
+  qchisq(0.999, ncol(data[21:54]))
+cat("cutoff = ", cutoff)
+cat("Number of outliers = ", dim(data[21:54][distances > cutoff, ])[1])
+
+data <- data[distances < cutoff, ]
+cat("Number of rows left after removing outliers = ", dim(data)[1], " ")
+
+#Export Cleaned DataSet
+write.csv(data, "./Documents/Dimentionality Reduction/Group Project/CleanedDataFile.csv", row.names=FALSE)
 
 
 
+###############################PCA######################
 
-#FA
-nofactors = fa.parallel(data[3:54], fm="ml", fa="fa")
+#PCA for part 1 quiz
+pca_part1 <-
+  princomp(data[3:20], cor = T, scores = T)
+pca_part1
+
+summary(pca_part1)
+pca_part1$loadings
+fviz_eig(pca_part1)
+names(pca_part1)
+pca$scores
+eig.val <- get_eigenvalue(pca_part1)
+eig.val
+
+
+#PCA for part 2 quiz
+pca_part2 <-
+  princomp(data[21:54], cor = T, scores = T)
+
+pca_part2
+summary(pca_part2)
+pca_part2$loadings
+fviz_eig(pca_part2)
+pca_part2$scores
+eig.val <- get_eigenvalue(pca_part2)
+eig.val
+
+
+
+#####################################FA#####################################
+
+nofactors = fa.parallel(data[21:54], fm="ml", fa="fa")
 nofactors$fa.values#eigen values
 
-EFA.model.two <- fa(data[3:54], nfactors=3, rotate = "oblimin", fm = "ml")
+####FA part 1 ########
+EFA.model.one <- fa(data[3:20], nfactors=3, rotate = "varimax", fm = "ml")
+fa.diagram(EFA.model.one)
+
+
+######FA part 2 ######
+EFA.model.two <- fa(data[21:54], nfactors=3, rotate = "varimax", fm = "ml")
 fa.diagram(EFA.model.two)
+
+
 
 
 
