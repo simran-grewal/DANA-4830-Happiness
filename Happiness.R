@@ -92,16 +92,16 @@ sum(is.na(data[,c(3:54)]))
 
 
 #Checking out of range values
-outOfRage <- lapply(data[3:54], function(X) {
-  outOfRange <- ifelse(!X %in% c(1:7), 'YES', 'NO')
-  if ('YES' %in% outOfRange) {
+outOfRange <- lapply(data[3:54], function(X) {
+  isInRange <- ifelse(!X %in% c(1:7), 'YES', 'NO')
+  if ('YES' %in% isInRange) {
     return(1)
   }
   return(0)
 })
 
 #Column M05 and E04 have out of range values
-names(which(outOfRage == 1))
+names(which(outOfRange == 1))
 
 table(data$M05);table(data$E04)
 
@@ -175,6 +175,7 @@ eig.val
 
 
 
+
 #####################################FA#####################################
 
 nofactors = fa.parallel(data[21:54], fm="ml", fa="fa")
@@ -186,7 +187,12 @@ fa.diagram(EFA.model.one)
 
 
 ######FA part 2 ######
-EFA.model.two <- fa(data[21:54], nfactors=3, rotate = "varimax", fm = "ml")
+
+nofactors = fa.parallel(data[21:54], fm="ml", fa="fa")
+nofactors$fa.values#eigen values
+
+
+EFA.model.two <- fa(data[21:54], nfactors=3, rotate = "oblimin", fm = "ml")
 fa.diagram(EFA.model.two)
 
 
