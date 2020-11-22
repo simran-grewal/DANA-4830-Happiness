@@ -191,14 +191,13 @@ fa.diagram(EFA.model.one)
 nofactors = fa.parallel(data[21:54], fm="ml", fa="fa")
 nofactors$fa.values#eigen values
 
-EFA.model.two <- fa(data[21:54], nfactors=7, rotate = "varimax", fm = "ml")
+EFA.model.two <- fa(data[21:54], nfactors=7, rotate = "oblimin", fm = "ml")
 fa.diagram(EFA.model.two)
 
 
 ##FA part 1 and part 2###
 EFA.model.two <- fa(data[3:54], nfactors=6, rotate = "oblimin", fm = "ml")
 fa.diagram(EFA.model.two)
-
 
 
 
