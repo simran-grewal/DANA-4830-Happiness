@@ -177,7 +177,14 @@ eig.val
 
 
 #####################################FA#####################################
+nofactors1 = fa.parallel(data[3:20], fm="ml", fa="fa")
+nofactors1$fa.values#eigen values
 
+nofactors2 = fa.parallel(data[21:54], fm="ml", fa="fa")
+nofactors2$fa.values#eigen values
+
+sum(nofactors1$fa.values > 0.7) ##new kaiser criterion
+sum(nofactors2$fa.values > 0.7) ##new kaiser criterion
 
 ####FA part 1 ########
 nofactors = fa.parallel(data[3:20], fm="ml", fa="fa")
