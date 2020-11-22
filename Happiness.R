@@ -156,7 +156,7 @@ summary(pca_part1)
 pca_part1$loadings
 fviz_eig(pca_part1)
 names(pca_part1)
-pca$scores
+pca_part1$scores
 eig.val <- get_eigenvalue(pca_part1)
 eig.val
 
