@@ -62,7 +62,7 @@ sort(rowSums(is.na(data[,3:54])), decreasing = T)
 
 
 #Columns 21 to 54 belongs to part2 questions
-###Replacing missing values in the part2 questions with the nutral value
+###Replacing missing values in the part2 questions with the neutral value
 data[21:54] <- lapply(data[21:54], function(X) {
   X <- ifelse(is.na(X), 4, X)
   return(X)
@@ -156,7 +156,7 @@ summary(pca_part1)
 pca_part1$loadings
 fviz_eig(pca_part1)
 names(pca_part1)
-pca$scores
+pca_part1$scores
 eig.val <- get_eigenvalue(pca_part1)
 eig.val
 
