@@ -178,21 +178,25 @@ eig.val
 
 #####################################FA#####################################
 
-nofactors = fa.parallel(data[21:54], fm="ml", fa="fa")
-nofactors$fa.values#eigen values
 
 ####FA part 1 ########
+nofactors = fa.parallel(data[3:20], fm="ml", fa="fa")
+nofactors$fa.values#eigen values
+
 EFA.model.one <- fa(data[3:20], nfactors=3, rotate = "varimax", fm = "ml")
 fa.diagram(EFA.model.one)
 
 
 ######FA part 2 ######
-
 nofactors = fa.parallel(data[21:54], fm="ml", fa="fa")
 nofactors$fa.values#eigen values
 
+EFA.model.two <- fa(data[21:54], nfactors=7, rotate = "varimax", fm = "ml")
+fa.diagram(EFA.model.two)
 
-EFA.model.two <- fa(data[21:54], nfactors=3, rotate = "oblimin", fm = "ml")
+
+##FA part 1 and part 2###
+EFA.model.two <- fa(data[3:54], nfactors=6, rotate = "oblimin", fm = "ml")
 fa.diagram(EFA.model.two)
 
 
