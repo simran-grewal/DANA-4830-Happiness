@@ -186,26 +186,68 @@ nofactors2$fa.values#eigen values
 sum(nofactors1$fa.values > 0.7) ##new kaiser criterion
 sum(nofactors2$fa.values > 0.7) ##new kaiser criterion
 
-####FA part 1 ########
-nofactors = fa.parallel(data[3:20], fm="ml", fa="fa")
-nofactors$fa.values#eigen values
 
-EFA.model.one <- fa(data[3:20], nfactors=3, rotate = "varimax", fm = "ml")
+
+####FA part 1 ########
+EFA.model.one <- fa(data[3:20], nfactors=2, rotate = "oblimin", fm = "ml")
 fa.diagram(EFA.model.one)
 
 
 ######FA part 2 ######
-nofactors = fa.parallel(data[21:54], fm="ml", fa="fa")
-nofactors$fa.values#eigen values
-
-EFA.model.two <- fa(data[21:54], nfactors=7, rotate = "oblimin", fm = "ml")
+EFA.model.two <- fa(data[21:54], nfactors=3, rotate = "oblimin", fm = "ml")
 fa.diagram(EFA.model.two)
 
+efa2new <- data[, c(21:48,50:54)]
+EFA.model.two.new <- fa(efa2new, nfactors=3, rotate = "oblimin", fm = "ml")
+fa.diagram(EFA.model.two.new)
 
-##FA part 1 and part 2###
-EFA.model.two <- fa(data[3:54], nfactors=6, rotate = "oblimin", fm = "ml")
-fa.diagram(EFA.model.two)
+#Fit indices
+#Comparative fix index (CFI) = 0.8934938 (<0.90, poor)
+EFA.model.one
+#RMSR: 0.05
+#RMSEA: 0.064
+#NNFI/TLI: 0.868
+EFA.model.one$STATISTIC
+EFA.model.one$dof
+EFA.model.one$null.chisq
+EFA.model.one$null.dof
+1 - ((279.3556-118)/(1744.852-153))
+#CFI: 0.8986366
 
+EFA.model.two.new
+#RMSR: 0.04
+#RMSEA: 0.066
+#NNFI/TLI: 0.847
+EFA.model.two.new$STATISTIC
+EFA.model.two.new$dof
+EFA.model.two.new$null.chisq
+EFA.model.two.new$null.dof
+1 - ((1064.346-432)/(5601.906-528))
+#CFI: 0.8753729
+
+#Reliability
+#part1
+#f1 for ML1; f2 for ML2
+names(data[, c(3:20)])
+f1p1 = c(3:8, 11, 15:16, 18:20)
+f2p1 = c(9:10, 12:14, 17)
+psych::alpha(data[ , f1p1])
+#raw alpha of factor 1: 0.86
+psych::alpha(data[ , f2p1])
+#raw alpha of factor 2: 0.68
+
+#part2
+#efa2new <- data[, c(21:48,50:54)]
+names(efa2new)
+f1p2 = c()
+f2p2 = c()
+f3p2 = c()
+psych::alpha(data[ , f1p2])
+#raw alpha of factor 1: 
+psych::alpha(data[ , f2p2])
+#raw alpha of factor 2: 
+psych::alpha(data[ , f3p2])
+#raw alpha of factor 3: 
 
 
 
