@@ -204,26 +204,26 @@ fa.diagram(EFA.model.two.new)
 #Fit indices
 #Comparative fix index (CFI) = 0.8934938 (<0.90, poor)
 EFA.model.one
-#RMSR: 0.05
-#RMSEA: 0.064
-#NNFI/TLI: 0.868
+#RMSR: 0.05; <0.06 excellent
+#RMSEA: 0.064; 0.06-0.08 acceptable
+#NNFI/TLI: 0.868; <0.90 poor
 EFA.model.one$STATISTIC
 EFA.model.one$dof
 EFA.model.one$null.chisq
 EFA.model.one$null.dof
 1 - ((279.3556-118)/(1744.852-153))
-#CFI: 0.8986366
+#CFI: 0.8986366; <0.90 poor
 
 EFA.model.two.new
-#RMSR: 0.04
-#RMSEA: 0.066
-#NNFI/TLI: 0.847
+#RMSR: 0.04; <0.06 excellent
+#RMSEA: 0.066; 0.06-0.08 acceptable
+#NNFI/TLI: 0.847; <0.90 poor
 EFA.model.two.new$STATISTIC
 EFA.model.two.new$dof
 EFA.model.two.new$null.chisq
 EFA.model.two.new$null.dof
 1 - ((1064.346-432)/(5601.906-528))
-#CFI: 0.8753729
+#CFI: 0.8753729; <0.90 poor
 
 #Reliability
 #part1
@@ -232,9 +232,9 @@ names(data[, c(3:20)])
 f1p1 = c(3:8, 11, 15:16, 18:20)
 f2p1 = c(9:10, 12:14, 17)
 psych::alpha(data[ , f1p1])
-#raw alpha of factor 1: 0.86
+#raw alpha of factor 1: 0.86; >0.80 acceptable
 psych::alpha(data[ , f2p1])
-#raw alpha of factor 2: 0.68
+#raw alpha of factor 2: 0.68; <0.80 unacceptable
 
 #part2
 #efa2new <- data[, c(21:48,50:54)]
@@ -243,11 +243,11 @@ f1p2 = c(25:28, 46, 48, 51:54)
 f2p2 = c(40:45, 47)
 f3p2 = c(21:24, 29:39, 50)
 psych::alpha(data[ , f1p2])
-#raw alpha of factor 1: 0.9
+#raw alpha of factor 1: 0.9; >0.80 acceptable
 psych::alpha(data[ , f2p2])
-#raw alpha of factor 2: 0.83
+#raw alpha of factor 2: 0.83; >0.80 acceptable
 psych::alpha(data[ , f3p2])
-#raw alpha of factor 3: 0.9
+#raw alpha of factor 3: 0.9; >0.80 acceptable
 
 
 
