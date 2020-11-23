@@ -164,8 +164,8 @@ eig.val
 #PCA for part 2 quiz
 pca_part2 <-
   princomp(data[21:54], cor = T, scores = T)
-
 pca_part2
+
 summary(pca_part2)
 pca_part2$loadings
 fviz_eig(pca_part2)
@@ -248,6 +248,21 @@ psych::alpha(data[ , f2p2])
 #raw alpha of factor 2: 0.83; >0.80 acceptable
 psych::alpha(data[ , f3p2])
 #raw alpha of factor 3: 0.9; >0.80 acceptable
+
+
+#################################DA########################
+
+
+
+
+
+
+
+
+#################################CA########################
+
+
+
 
 
 
