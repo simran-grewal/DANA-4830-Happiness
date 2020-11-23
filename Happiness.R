@@ -189,8 +189,10 @@ sum(nofactors2$fa.values > 0.7) ##new kaiser criterion
 
 
 ####FA part 1 ########
-EFA.model.one <- fa(data[3:20], nfactors=2, rotate = "oblimin", fm = "ml")
+EFA.model.one <- fa(data[3:20], nfactors=2, rotate = "varimax", fm = "ml")
 fa.diagram(EFA.model.one)
+
+EFA.model.one$scores
 
 
 ######FA part 2 ######
@@ -200,6 +202,7 @@ fa.diagram(EFA.model.two)
 efa2new <- data[, c(21:48,50:54)]
 EFA.model.two.new <- fa(efa2new, nfactors=3, rotate = "oblimin", fm = "ml")
 fa.diagram(EFA.model.two.new)
+
 
 #Fit indices
 #Comparative fix index (CFI) = 0.8934938 (<0.90, poor)
@@ -249,6 +252,18 @@ psych::alpha(data[ , f2p2])
 psych::alpha(data[ , f3p2])
 #raw alpha of factor 3: 0.9; >0.80 acceptable
 
+###########Measuring factors #################
+
+
+data$MeaningAndEngagement <- c(rowSums(data[,c("M11", "M14", "M02", "M12", "M05", "E04", "E09", "M17", "E07", "P13", "E01", "E10")])/12)
+data$Pleasure <- c(rowSums(data[,c("P15", "P03", "P18", "P16", "P08", "E06")])/6)
+
+
+data$EnvironmentalConscious <- c(rowSums(data[, c("SC_4", "SC_13", "SC_19", "SC_18", "SC_17", "SC_3", "SC_12", "SC_14", "SC_9", "SC_20", "SC_1", "SC_16", "SC_11", "SC_2", "SC_15", "SC_31")])/16)
+data$FourRsPrincipa <- c(rowSums(data[,c("SC_22", "SC_26", "SC_25", "SC_21", "SC_23", "SC_28", "SC_24")])/7)
+data$EnergyConservation <- c(rowSums(data[, c("SC_33", "SC_34", "SC_35", "SC_7", "SC_6", "SC_5", "SC_32", "SC_29", "SC_27", "SC_8")])/10)
+
+head(data)
 
 #################################DA########################
 
@@ -256,14 +271,7 @@ psych::alpha(data[ , f3p2])
 
 
 
-
-
-
 #################################CA########################
-
-
-
-
 
 
 
