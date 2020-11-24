@@ -261,7 +261,7 @@ data$Pleasure <- c(rowSums(data[,c("P15", "P03", "P18", "P16", "P08", "E06")])/6
 
 
 data$EnvironmentalConscious <- c(rowSums(data[, c("SC_4", "SC_13", "SC_19", "SC_18", "SC_17", "SC_3", "SC_12", "SC_14", "SC_9", "SC_20", "SC_1", "SC_16", "SC_11", "SC_2", "SC_15", "SC_31")])/16)
-data$FourRsPrincipal <- c(rowSums(data[,c("SC_22", "SC_26", "SC_25", "SC_21", "SC_23", "SC_28", "SC_24")])/7)
+data$ThreeRs <- c(rowSums(data[,c("SC_22", "SC_26", "SC_25", "SC_21", "SC_23", "SC_28", "SC_24")])/7)
 data$EnergyConservation <- c(rowSums(data[, c("SC_33", "SC_34", "SC_35", "SC_7", "SC_6", "SC_5", "SC_32", "SC_29", "SC_27", "SC_8")])/10)
 
 
@@ -271,7 +271,7 @@ data_reduced <- data[,c("water",
                         "MeaningAndEngagement", 
                         "Pleasure", 
                         "EnvironmentalConscious", 
-                        "FourRsPrincipal", 
+                        "ThreeRs", 
                         "EnergyConservation",
                         "petrol",
                         "electricity",
