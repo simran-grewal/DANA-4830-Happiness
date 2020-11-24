@@ -5,6 +5,7 @@ library(GPArotation)
 library(stats)
 library(psych)
 library("factoextra")
+library(corrplot)
 
 data <- read.csv('./Documents/Dimentionality Reduction/Group Project/Happiness-Sustainable-Behaviour.csv')
 data$X <- NULL
@@ -260,10 +261,43 @@ data$Pleasure <- c(rowSums(data[,c("P15", "P03", "P18", "P16", "P08", "E06")])/6
 
 
 data$EnvironmentalConscious <- c(rowSums(data[, c("SC_4", "SC_13", "SC_19", "SC_18", "SC_17", "SC_3", "SC_12", "SC_14", "SC_9", "SC_20", "SC_1", "SC_16", "SC_11", "SC_2", "SC_15", "SC_31")])/16)
-data$FourRsPrincipa <- c(rowSums(data[,c("SC_22", "SC_26", "SC_25", "SC_21", "SC_23", "SC_28", "SC_24")])/7)
+data$FourRsPrincipal <- c(rowSums(data[,c("SC_22", "SC_26", "SC_25", "SC_21", "SC_23", "SC_28", "SC_24")])/7)
 data$EnergyConservation <- c(rowSums(data[, c("SC_33", "SC_34", "SC_35", "SC_7", "SC_6", "SC_5", "SC_32", "SC_29", "SC_27", "SC_8")])/10)
 
-head(data)
+
+
+################Regression Analysis ################
+data_reduced <- data[,c("water", 
+                        "MeaningAndEngagement", 
+                        "Pleasure", 
+                        "EnvironmentalConscious", 
+                        "FourRsPrincipal", 
+                        "EnergyConservation",
+                        "petrol",
+                        "electricity",
+                        "income",
+                        "adult",
+                        "home",
+                        "edu",
+                        "job",
+                        "sex",
+                        "age")]
+
+NAcol <- which(colSums(is.na(data_reduced)) > 0);NAcol
+sort(colSums(sapply(data_reduced[NAcol], is.na)), decreasing = TRUE)
+
+#Replacing NULL values in the sex column with female, as we know most of the participants are female in this survey
+data_reduced$sex <- ifelse(is.na(data_reduced$sex), 1, data_reduced$sex)
+
+
+M <- cor(data_reduced, use = "pairwise.complete.obs")
+corrplot(M, method = "number", type = "upper")
+
+
+#It is clear from the correlation plot that None of the demographic variables have correlation with other 
+#variables, which means we cannot use any of the variables from demographic data as a response variable and cannot
+#do regression analysis on this dataset
+
 
 #################################DA########################
 
