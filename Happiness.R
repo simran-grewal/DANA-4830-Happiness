@@ -265,7 +265,7 @@ data$FourRsPrincipal <- c(rowSums(data[,c("SC_22", "SC_26", "SC_25", "SC_21", "S
 data$EnergyConservation <- c(rowSums(data[, c("SC_33", "SC_34", "SC_35", "SC_7", "SC_6", "SC_5", "SC_32", "SC_29", "SC_27", "SC_8")])/10)
 
 
-
+head(data)
 ################Regression Analysis ################
 data_reduced <- data[,c("water", 
                         "MeaningAndEngagement", 
