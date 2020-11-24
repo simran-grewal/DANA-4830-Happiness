@@ -299,6 +299,98 @@ corrplot(M, method = "number", type = "upper")
 #do regression analysis on this dataset
 
 
+#################################SR########################
+#Part 1: Independent variable; Part 2: Dependent Variable
+#Relationships between 'Orientations of Happiness' (OTH) and different categories of sustainable behaviors
+#OTH: data$MeaningAndEngagement, data$Pleasure
+#sb1 for data$EnvironmentalConscious
+#sb2 for data$ThreeRs
+#sb3 for data$EnergyConservation
+
+sb1 <- lm(data$EnvironmentalConscious ~ data$MeaningAndEngagement + data$Pleasure, data=data)
+summary(sb1)
+par(mfrow = c(2, 2))
+plot(sb1)
+#Normality: It fails normality as not all the points fall approximately along the reference line in the Normal Q-Q plot.
+#Linearity: It passes linearity as the red line is close to the dashed line in the residuals vs fitted plot.
+library(lmtest)
+bptest(sb1)
+#Homogeneity assumes the variances of the variables are roughly equal; Homoscedasticity assumes the spread of the variance of variable is the same across all values of the other variable.
+#It passes homogeneity and homoscedasticity as the line is horizontal which shows that the average magnitude of the standardized residual is NOT changing much as a function of the fitted values.
+#The spread around the red line does NOT vary with the fitted values so the variability of magnitudes does NOT vary much as a function of the fitted values.
+#We do NOT reject the null hypothesis of homoskedasticity as the p-value is far from 0. As expected, there is NO strong heteroskedasticity.
+#leverage - the hat values are the fitted values
+#A leverage point is defined as an observation that has a value of x that is far away from the mean of x
+k1 = 2 ##number of IVs in the sb1
+leveragesb1 = hatvalues(sb1)
+nrow(data) #338
+cutleveragesb1 = (2*k1+2) / nrow(data)
+cutleveragesb1 ##cut off = 0.01775148
+badleveragesb1 = as.numeric(leveragesb1 > cutleveragesb1)
+table(badleveragesb1)
+badleveragesb1
+#Cook's distance measures the influence of each observation in the model
+cookssb1 = cooks.distance(sb1)
+cutcookssb1 = 4 / (nrow(data) - k1 - 1)
+cutcookssb1 ##get the cut off = 0.0119403
+badcookssb1 = as.numeric(cookssb1 > cutcookssb1)
+table(badcookssb1)
+badcookssb1
+##overall outliers
+##add them up and get rid of them
+totaloutsb1 = badleveragesb1 + badcookssb1
+table(totaloutsb1)
+totaloutsb1
+inlinersb1 = subset(data, totaloutsb1 < 2) #330 observations
+#inspect assumptions
+sb1.clean <- lm(inlinersb1$EnvironmentalConscious ~ inlinersb1$MeaningAndEngagement + inlinersb1$Pleasure, data=inlinersb1)
+summary(sb1.clean)
+par(mfrow = c(2, 2))
+plot(sb1.clean)
+par(mfrow = c(1, 1))
+#assumption set up
+#studentized residuals for any given data point 
+#are calculated from a model fit to every other data point except the one in question
+standardizedsb1 = rstudent(sb1.clean) #Create the standardized residuals
+fittedsb1 = scale(sb1.clean$fitted.values) #Create the fitted values
+fittedsb1
+#normality
+hist(standardizedsb1)
+#Most of the data is between -2 and 2, but it is NOT centered over 0, still a couple wonky points.
+#linearity
+qqnorm(standardizedsb1)
+abline(0,1)
+#Although most of the points stick with the straight line, it is still slightly curvilinear.
+##homogeneity and homoscedasticity
+plot(fittedsb1, standardizedsb1) 
+abline(0,0)
+abline(v=0)
+abline(v=-2)
+abline(v=2)
+abline(h=-2)
+abline(h=2)
+#From the residual scatterplot, most of the residuals lie between residual = -2 and residual 2
+#some of the residuals lie around the residual = 0 line, a few residuals lie outside residual = -2 and residual 2.
+#The shape of the residual scatterplot is like a round circle.
+library(lmtest)
+bptest(sb1.clean)
+#We do NOT reject the null hypothesis of homoskedasticity as the p-value is far from 0. As expected, there is NO strong heteroskedasticity.
+#stepwise
+#The interceptis the expected mean value of Y when all X=0
+intercept.only.model.sb1 <- lm(inlinersb1$EnvironmentalConscious ~ 1, data = inlinersb1)
+summary(intercept.only.model.sb1)
+full.model.clean.sb1 <- lm(EnvironmentalConscious ~ MeaningAndEngagement + Pleasure, data = inlinersb1)
+#option 1 - step() in the stats package
+lm.step.sb1 <- step(intercept.only.model.sb1, direction = 'both', scope = formula(full.model.clean.sb1))
+lm.step.res.sb1 <- resid(lm.step.sb1)
+lm.step.one.sb1 <- lm(EnvironmentalConscious ~ MeaningAndEngagement, data = inlinersb1)
+summary(lm.step.one.sb1)
+##get beta to identify which IDV is important
+library(QuantPsyc)
+lm.beta(lm.step.sb1)
+#Pleasure is removed
+
+
 #################################DA########################
 
 
