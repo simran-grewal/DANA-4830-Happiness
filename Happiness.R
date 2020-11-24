@@ -294,7 +294,7 @@ M <- cor(data_reduced, use = "pairwise.complete.obs")
 corrplot(M, method = "number", type = "upper")
 
 
-#It is clear from the correlation plot that None of the demographic variables have correlation with other 
+#It is clear from the correlation plot that none of the demographic variables have correlation with other 
 #variables, which means we cannot use any of the variables from demographic data as a response variable and cannot
 #do regression analysis on this dataset
 
@@ -309,8 +309,7 @@ corrplot(M, method = "number", type = "upper")
 
 sb1 <- lm(data$EnvironmentalConscious ~ data$MeaningAndEngagement + data$Pleasure, data=data)
 summary(sb1)
-par(mfrow = c(2, 2))
-plot(sb1)
+par(mfrow = c(2, 2)); plot(sb1)
 #Normality: It fails normality as not all the points fall approximately along the reference line in the Normal Q-Q plot.
 #Linearity: It passes linearity as the red line is close to the dashed line in the residuals vs fitted plot.
 library(lmtest)
@@ -324,51 +323,35 @@ bptest(sb1)
 k1 = 2 ##number of IVs in the sb1
 leveragesb1 = hatvalues(sb1)
 nrow(data) #338
-cutleveragesb1 = (2*k1+2) / nrow(data)
-cutleveragesb1 ##cut off = 0.01775148
+cutleveragesb1 = (2*k1+2) / nrow(data); cutleveragesb1 ##cut off = 0.01775148
 badleveragesb1 = as.numeric(leveragesb1 > cutleveragesb1)
-table(badleveragesb1)
-badleveragesb1
+table(badleveragesb1); badleveragesb1
 #Cook's distance measures the influence of each observation in the model
 cookssb1 = cooks.distance(sb1)
-cutcookssb1 = 4 / (nrow(data) - k1 - 1)
-cutcookssb1 ##get the cut off = 0.0119403
+cutcookssb1 = 4 / (nrow(data) - k1 - 1); cutcookssb1 ##get the cut off = 0.0119403
 badcookssb1 = as.numeric(cookssb1 > cutcookssb1)
-table(badcookssb1)
-badcookssb1
-##overall outliers
-##add them up and get rid of them
+table(badcookssb1); badcookssb1
+#overall outliers; add them up and get rid of them
 totaloutsb1 = badleveragesb1 + badcookssb1
-table(totaloutsb1)
-totaloutsb1
+table(totaloutsb1); totaloutsb1
 inlinersb1 = subset(data, totaloutsb1 < 2) #330 observations
 #inspect assumptions
 sb1.clean <- lm(inlinersb1$EnvironmentalConscious ~ inlinersb1$MeaningAndEngagement + inlinersb1$Pleasure, data=inlinersb1)
 summary(sb1.clean)
-par(mfrow = c(2, 2))
-plot(sb1.clean)
-par(mfrow = c(1, 1))
+par(mfrow = c(2, 2)); plot(sb1.clean); par(mfrow = c(1, 1))
 #assumption set up
 #studentized residuals for any given data point 
 #are calculated from a model fit to every other data point except the one in question
 standardizedsb1 = rstudent(sb1.clean) #Create the standardized residuals
-fittedsb1 = scale(sb1.clean$fitted.values) #Create the fitted values
-fittedsb1
+fittedsb1 = scale(sb1.clean$fitted.values); fittedsb1 #Create the fitted values
 #normality
 hist(standardizedsb1)
 #Most of the data is between -2 and 2, but it is NOT centered over 0, still a couple wonky points.
 #linearity
-qqnorm(standardizedsb1)
-abline(0,1)
+qqnorm(standardizedsb1); abline(0,1)
 #Although most of the points stick with the straight line, it is still slightly curvilinear.
 ##homogeneity and homoscedasticity
-plot(fittedsb1, standardizedsb1) 
-abline(0,0)
-abline(v=0)
-abline(v=-2)
-abline(v=2)
-abline(h=-2)
-abline(h=2)
+plot(fittedsb1, standardizedsb1); abline(0,0); abline(v=0); abline(v=-2); abline(v=2); abline(h=-2); abline(h=2)
 #From the residual scatterplot, most of the residuals lie between residual = -2 and residual 2
 #some of the residuals lie around the residual = 0 line, a few residuals lie outside residual = -2 and residual 2.
 #The shape of the residual scatterplot is like a round circle.
