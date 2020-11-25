@@ -190,7 +190,7 @@ sum(nofactors2$fa.values > 0.7) ##new kaiser criterion
 
 
 ####FA part 1 ########
-EFA.model.one <- fa(data[3:20], nfactors=2, rotate = "varimax", fm = "ml")
+EFA.model.one <- fa(data[3:20], nfactors=2, rotate = "oblimin", fm = "ml")
 fa.diagram(EFA.model.one)
 
 EFA.model.one$scores
