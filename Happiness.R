@@ -439,6 +439,71 @@ library(QuantPsyc)
 lm.beta(lm.step.sb2)
 #Pleasure is removed
 
+sb3 <- lm(data$EnergyConservation ~ data$MeaningAndEngagement + data$Pleasure, data=data)
+summary(sb3)
+par(mfrow = c(2, 2)); plot(sb3)
+#Normality: It fails normality as all the points fall approximately along the reference line in the Normal Q-Q plot.
+#Linearity: It passes linearity as the red line is close to the dashed line in the residuals vs fitted plot.
+library(lmtest)
+bptest(sb3)
+#Homogeneity assumes the variances of the variables are roughly equal; Homoscedasticity assumes the spread of the variance of variable is the same across all values of the other variable.
+#It fails homogeneity and homoscedasticity as the line is NOT horizontal which shows that the average magnitude of the standardized residual is changing much as a function of the fitted values.
+#The spread around the red line vary with the fitted values so the variability of magnitudes vary much as a function of the fitted values.
+#We reject the null hypothesis of homoskedasticity as the p-value is close to 0. As expected, there is strong heteroskedasticity.
+#leverage - the hat values are the fitted values
+#A leverage point is defined as an observation that has a value of x that is far away from the mean of x
+k3 = 2 ##number of IVs in the sb3
+leveragesb3 = hatvalues(sb3)
+nrow(data) #338
+cutleveragesb3 = (2*k3+2) / nrow(data); cutleveragesb3 ##cut off = 0.01775148
+badleveragesb3 = as.numeric(leveragesb3 > cutleveragesb3)
+table(badleveragesb3); badleveragesb3
+#Cook's distance measures the influence of each observation in the model
+cookssb3 = cooks.distance(sb3)
+cutcookssb3 = 4 / (nrow(data) - k3 - 1); cutcookssb3 ##get the cut off = 0.0119403
+badcookssb3 = as.numeric(cookssb3 > cutcookssb3)
+table(badcookssb3); badcookssb3
+#overall outliers; add them up and get rid of them
+totaloutsb3 = badleveragesb3 + badcookssb3
+table(totaloutsb3); totaloutsb3
+inlinersb3 = subset(data, totaloutsb3 < 2) #333 observations
+#inspect assumptions
+sb3.clean <- lm(inlinersb3$EnergyConservation ~ inlinersb3$MeaningAndEngagement + inlinersb3$Pleasure, data=inlinersb3)
+summary(sb3.clean)
+par(mfrow = c(2, 2)); plot(sb3.clean); par(mfrow = c(1, 1))
+#assumption set up
+#studentized residuals for any given data point 
+#are calculated from a model fit to every other data point except the one in question
+standardizedsb3 = rstudent(sb3.clean) #Create the standardized residuals
+fittedsb3 = scale(sb3.clean$fitted.values); fittedsb3 #Create the fitted values
+#normality
+hist(standardizedsb3)
+#Most of the data is between -2 and 2, but it is NOT centered over 0, still a couple wonky points.
+#linearity
+qqnorm(standardizedsb3); abline(0,1)
+#Although most of the points stick with the straight line, it is still slightly curvilinear.
+##homogeneity and homoscedasticity
+plot(fittedsb3, standardizedsb3); abline(0,0); abline(v=0); abline(v=-2); abline(v=2); abline(h=-2); abline(h=2)
+#From the residual scatterplot, most of the residuals lie between residual = -2 and residual 2
+#some of the residuals lie around the residual = 0 line, a few residuals lie outside residual = -2 and residual 2.
+#The shape of the residual scatterplot is like a round circle.
+library(lmtest)
+bptest(sb3.clean)
+#We reject the null hypothesis of homoskedasticity as the p-value is close to 0. As expected, there is strong heteroskedasticity.
+#stepwise
+#The intercept is the expected mean value of Y when all X=0
+intercept.only.model.sb3 <- lm(inlinersb3$EnergyConservation ~ 1, data = inlinersb3)
+summary(intercept.only.model.sb3)
+full.model.clean.sb3 <- lm(EnergyConservation ~ MeaningAndEngagement + Pleasure, data = inlinersb3)
+#option 1 - step() in the stats package
+lm.step.sb3 <- step(intercept.only.model.sb3, direction = 'both', scope = formula(full.model.clean.sb3))
+lm.step.res.sb3 <- resid(lm.step.sb3)
+lm.step.one.sb3 <- lm(EnergyConservation ~ MeaningAndEngagement, data = inlinersb3)
+summary(lm.step.one.sb3)
+##get beta to identify which IDV is important
+library(QuantPsyc)
+lm.beta(lm.step.sb3)
+#Pleasure is removed
 
 #################################DA########################
 
