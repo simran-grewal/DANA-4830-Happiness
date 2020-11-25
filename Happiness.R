@@ -359,7 +359,7 @@ library(lmtest)
 bptest(sb1.clean)
 #We do NOT reject the null hypothesis of homoskedasticity as the p-value is far from 0. As expected, there is NO strong heteroskedasticity.
 #stepwise
-#The interceptis the expected mean value of Y when all X=0
+#The intercept is the expected mean value of Y when all X=0
 intercept.only.model.sb1 <- lm(inlinersb1$EnvironmentalConscious ~ 1, data = inlinersb1)
 summary(intercept.only.model.sb1)
 full.model.clean.sb1 <- lm(EnvironmentalConscious ~ MeaningAndEngagement + Pleasure, data = inlinersb1)
@@ -371,6 +371,72 @@ summary(lm.step.one.sb1)
 ##get beta to identify which IDV is important
 library(QuantPsyc)
 lm.beta(lm.step.sb1)
+#Pleasure is removed
+
+sb2 <- lm(data$ThreeRs ~ data$MeaningAndEngagement + data$Pleasure, data=data)
+summary(sb2)
+par(mfrow = c(2, 2)); plot(sb2)
+#Normality: It passes normality as all the points fall approximately along the reference line in the Normal Q-Q plot.
+#Linearity: It passes linearity as the red line is close to the dashed line in the residuals vs fitted plot.
+library(lmtest)
+bptest(sb2)
+#Homogeneity assumes the variances of the variables are roughly equal; Homoscedasticity assumes the spread of the variance of variable is the same across all values of the other variable.
+#It fails homogeneity and homoscedasticity as the line is NOT horizontal which shows that the average magnitude of the standardized residual is changing much as a function of the fitted values.
+#The spread around the red line vary with the fitted values so the variability of magnitudes vary much as a function of the fitted values.
+#We do NOT reject the null hypothesis of homoskedasticity as the p-value is far from 0. As expected, there is NO strong heteroskedasticity.
+#leverage - the hat values are the fitted values
+#A leverage point is defined as an observation that has a value of x that is far away from the mean of x
+k2 = 2 ##number of IVs in the sb2
+leveragesb2 = hatvalues(sb2)
+nrow(data) #338
+cutleveragesb2 = (2*k2+2) / nrow(data); cutleveragesb2 ##cut off = 0.01775148
+badleveragesb2 = as.numeric(leveragesb2 > cutleveragesb2)
+table(badleveragesb2); badleveragesb2
+#Cook's distance measures the influence of each observation in the model
+cookssb2 = cooks.distance(sb2)
+cutcookssb2 = 4 / (nrow(data) - k2 - 1); cutcookssb2 ##get the cut off = 0.0119403
+badcookssb2 = as.numeric(cookssb2 > cutcookssb2)
+table(badcookssb2); badcookssb2
+#overall outliers; add them up and get rid of them
+totaloutsb2 = badleveragesb2 + badcookssb2
+table(totaloutsb2); totaloutsb2
+inlinersb2 = subset(data, totaloutsb2 < 2) #329 observations
+#inspect assumptions
+sb2.clean <- lm(inlinersb2$ThreeRs ~ inlinersb2$MeaningAndEngagement + inlinersb2$Pleasure, data=inlinersb2)
+summary(sb2.clean)
+par(mfrow = c(2, 2)); plot(sb2.clean); par(mfrow = c(1, 1))
+#assumption set up
+#studentized residuals for any given data point 
+#are calculated from a model fit to every other data point except the one in question
+standardizedsb2 = rstudent(sb2.clean) #Create the standardized residuals
+fittedsb2 = scale(sb2.clean$fitted.values); fittedsb2 #Create the fitted values
+#normality
+hist(standardizedsb2)
+#Most of the data is between -2 and 2, but it is NOT centered over 0, still a couple wonky points.
+#linearity
+qqnorm(standardizedsb2); abline(0,1)
+#Most of the points stick with the straight line, it is linear.
+##homogeneity and homoscedasticity
+plot(fittedsb2, standardizedsb2); abline(0,0); abline(v=0); abline(v=-2); abline(v=2); abline(h=-2); abline(h=2)
+#From the residual scatterplot, most of the residuals lie between residual = -2 and residual 2
+#some of the residuals lie around the residual = 0 line, a few residuals lie outside residual = -2 and residual 2.
+#The shape of the residual scatterplot is like a round circle.
+library(lmtest)
+bptest(sb2.clean)
+#We do NOT reject the null hypothesis of homoskedasticity as the p-value is far from 0. As expected, there is NO strong heteroskedasticity.
+#stepwise
+#The intercept is the expected mean value of Y when all X=0
+intercept.only.model.sb2 <- lm(inlinersb2$EnvironmentalConscious ~ 1, data = inlinersb2)
+summary(intercept.only.model.sb2)
+full.model.clean.sb2 <- lm(EnvironmentalConscious ~ MeaningAndEngagement + Pleasure, data = inlinersb2)
+#option 1 - step() in the stats package
+lm.step.sb2 <- step(intercept.only.model.sb2, direction = 'both', scope = formula(full.model.clean.sb2))
+lm.step.res.sb2 <- resid(lm.step.sb2)
+lm.step.one.sb2 <- lm(EnvironmentalConscious ~ MeaningAndEngagement, data = inlinersb2)
+summary(lm.step.one.sb2)
+##get beta to identify which IDV is important
+library(QuantPsyc)
+lm.beta(lm.step.sb2)
 #Pleasure is removed
 
 
