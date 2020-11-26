@@ -1,25 +1,26 @@
 #setup
+rm(list = ls())
 setwd("/Users/DD/Desktop/Class")
 x <- read.csv("Dana 4820/proj/loan_data_set.csv", TRUE, ',')
 summary(x)
 #remove loan id
 x <- x[ , -c(1)]
 
-
+table(x$Loan_Status)
 percentmiss = function(x) {sum(is.na(x)) / length(x)*100}
 missing = apply(x, 1, percentmiss)
 table(missing)
 #84 rows with 1/12 = 8.33% missing data. aka 84 rows with missing 1 value 
+#1 row with 2/12 = 16.67% missing data. aka 1 row with missing 2 values
 str(x)
 View(x)
-
 
 table(x$Credit_History)
 #credit history is binary, but not coded as factor
 x$Credit_History = factor(x$Credit_History, levels = c(0,1)) 
 
 
-#multi colinearity
+#detect multicollinearity among 4 non-categorical variables
 cor = cor(x[ , c(6,7,8,9)], use = 'pairwise.complete.obs')
 View(cor)
 symnum(cor)
