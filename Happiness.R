@@ -432,7 +432,49 @@ library(QuantPsyc); lm.beta(lm.step.sb3)
 
 
 
-#################################CA########################
+#################################MCA#######################
+#### Data preparation
+contingency <- read.csv('/Users/zhangzhixuan/Desktop/DANA4830/Project/contingency.csv')
+table_contingency <- contingency[,-1]
+rownames(table_contingency) <- contingency[,1]
+MeaningAndEngagement <- c(colSums(table_contingency[c("M11", "M14", "M02", "M12", "M05", "E04", "E09", "M17", "E07", "P13", "E01", "E10"),]))
+Pleasure <- c(colSums(table_contingency[c("P15", "P03", "P18", "P16", "P08", "E06"),]))
+EnvironmentalConscious <- c(colSums(table_contingency[c("SC_4", "SC_13", "SC_19", "SC_18", "SC_17", "SC_3", "SC_12", "SC_14", "SC_9", "SC_20", "SC_1", "SC_16", "SC_11", "SC_2", "SC_15", "SC_31"),]))
+ThreeRs <- c(colSums(table_contingency[c("SC_22", "SC_26", "SC_25", "SC_21", "SC_23", "SC_28", "SC_24"),]))
+EnergyConservation <- c(colSums(table_contingency[c("SC_33", "SC_34", "SC_35", "SC_7", "SC_6", "SC_5", "SC_32", "SC_29", "SC_27", "SC_8"),]))
+new_table_contigency <- rbind(MeaningAndEngagement, Pleasure, EnvironmentalConscious, ThreeRs, EnergyConservation)
+
+### MCA 
+mca<-new_table_contigency
+View(mca)
+mca <- as.data.frame(mca)
+rownames(mca) <- mca[,1]
+ca.mca <- CA(mca, graph = TRUE)
+print(ca.mca)
+
+## cutoff point
+1/(nrow(mca)-1) #0.25
+1/(ncol(mca)-1) # 0.167
+## plot without arrows
+fviz_screeplot(ca.mca,addlabels=T) + 
+  geom_hline(yintercept=16.7,linetype=2,color="red")
+
+### loadings for rows & columns
+row <- get_ca_row(ca.mca)
+row$cos2
+col <- get_ca_col(ca.mca)
+col$cos2
+### Checking coordinates
+row$coord
+col$coord
+#plot a standard asymetric biplot ( with arrows)
+fviz_ca_biplot(ca.mca,
+               map ="rowprincipal", arrow = c(TRUE, TRUE),
+               repel = TRUE)
+### plot columns-wise
+fviz_ca_col(ca.mca)
+### plot rows-wise
+fviz_ca_row(ca.mca, repel = TRUE)# relationship between row points
 
 
 
