@@ -294,9 +294,10 @@ M <- cor(data_reduced, use = "pairwise.complete.obs")
 corrplot(M, method = "number", type = "upper")
 
 
-#It is clear from the correlation plot that none of the demographic variables have correlation with other 
+#It is clear from the correlation plot that None of the demographic variables have correlation with other 
 #variables, which means we cannot use any of the variables from demographic data as a response variable and cannot
 #do regression analysis on this dataset
+
 
 
 #################################SR########################
@@ -480,14 +481,41 @@ lm.step.one.sb3 <- lm(EnergyConservation ~ MeaningAndEngagement, data = inliners
 library(QuantPsyc); lm.beta(lm.step.sb3)
 #MeaningAndEngagement = 0.58524790; Pleasure is removed
 
+
+###########Contengency Table##################
+# m <- matrix(nrow = length(data[,c(3:48,50:54)]), ncol = 7)
+# d <- lapply(data[,c(3:48,50:54)], function(X) {
+#   table_cont <- table(X)
+#   return(table_cont)
+# })
+# 
+# table(data$M02)
+
+
+contingency <- read.csv('./Documents/Dimentionality Reduction/Group Project/DANA-4830-Happiness/contingency.csv')
+
+table_contingency <- contingency[,-1]
+
+rownames(table_contingency) <- contingency[,1]
+
+
+
+MeaningAndEngagement <- c(colSums(table_contingency[c("M11", "M14", "M02", "M12", "M05", "E04", "E09", "M17", "E07", "P13", "E01", "E10"),]))
+Pleasure <- c(colSums(table_contingency[c("P15", "P03", "P18", "P16", "P08", "E06"),]))
+
+
+EnvironmentalConscious <- c(colSums(table_contingency[c("SC_4", "SC_13", "SC_19", "SC_18", "SC_17", "SC_3", "SC_12", "SC_14", "SC_9", "SC_20", "SC_1", "SC_16", "SC_11", "SC_2", "SC_15", "SC_31"),]))
+ThreeRs <- c(colSums(table_contingency[c("SC_22", "SC_26", "SC_25", "SC_21", "SC_23", "SC_28", "SC_24"),]))
+EnergyConservation <- c(colSums(table_contingency[c("SC_33", "SC_34", "SC_35", "SC_7", "SC_6", "SC_5", "SC_32", "SC_29", "SC_27", "SC_8"),]))
+
+new_table_contigency <- rbind(MeaningAndEngagement, Pleasure, EnvironmentalConscious, ThreeRs, EnergyConservation)
+
+new_table_contigency
 #################################DA########################
 
 
 
-
-
 #################################CA########################
-
 
 
 
