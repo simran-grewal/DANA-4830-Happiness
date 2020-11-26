@@ -301,7 +301,7 @@ corrplot(M, method = "number", type = "upper")
 
 #################################SR########################
 #Part 1: Independent variable; Part 2: Dependent Variable
-#Relationships between 'Orientations of Happiness' (OTH) and different categories of sustainable behaviors
+#Relationships between 'Orientations of Happiness' (OTH) & different categories of Sustainable Behaviors (SBs)
 #OTH: data$MeaningAndEngagement, data$Pleasure
 #sb1 for data$EnvironmentalConscious; sb2 for data$ThreeRs; sb3 for data$EnergyConservation
 
