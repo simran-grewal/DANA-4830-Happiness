@@ -427,10 +427,234 @@ library(QuantPsyc); lm.beta(lm.step.sb3)
 #MeaningAndEngagement = 0.58524790; Pleasure is removed
 
 #################################DA########################
+# Discriminant Analysis 
+library(tidyverse)
+library(MASS)  #load the package for lda functions
+library(DiscriMiner) #load the package for lda functions
+library(ggplot2)  #visualization
+library(dplyr) #data manipulation
+library(gridExtra) #visualization
+library(car) #multvariate test
+library(psych) 
+library(corrplot) #visualization for correlation
+library(Hmisc)
+### Data preparation
+data<-read.csv('/Users/zhangzhixuan/Desktop/DANA4830/Project/CleanedDataFile.csv')
+data$MeaningAndEngagement <- c(rowSums(data[,c("M11", "M14", "M02", "M12", "M05", "E04", "E09", "M17", "E07", "P13", "E01", "E10")])/12)
+data$Pleasure <- c(rowSums(data[,c("P15", "P03", "P18", "P16", "P08", "E06")])/6)
 
 
+data$EnvironmentalConscious <- c(rowSums(data[, c("SC_4", "SC_13", "SC_19", "SC_18", "SC_17", "SC_3", "SC_12", "SC_14", "SC_9", "SC_20", "SC_1", "SC_16", "SC_11", "SC_2", "SC_15", "SC_31")])/16)
+data$ThreeRs <- c(rowSums(data[,c("SC_22", "SC_26", "SC_25", "SC_21", "SC_23", "SC_28", "SC_24")])/7)
+data$EnergyConservation <- c(rowSums(data[, c("SC_33", "SC_34", "SC_35", "SC_7", "SC_6", "SC_5", "SC_32", "SC_29", "SC_27", "SC_8")])/10)
+#####-------------DA using 5 factors from Part1 & Part2---------------
+sex<-data$sex
+v1<-data$MeaningAndEngagement;v1
+v2<-data$Pleasure
+v3<-data$EnvironmentalConscious
+v4<-data$ThreeRs
+v5<-data$EnergyConservation
+DA <- data_frame(sex,v1,v2,v3,v4,v5)
+DA$sex=factor(DA$sex)
+DA <- na.omit(DA)
+summary(DA)
+###--Assumption--Check---------------------------------
+qqPlot(DA$v1)
+qqPlot(DA$v2)
+qqPlot(DA$v3)
+qqPlot(DA$v4)
+qqPlot(DA$v5)
+shapiro.test(DA$v1) 
+shapiro.test(DA$v2) 
+shapiro.test(DA$v3) 
+shapiro.test(DA$v4) 
+shapiro.test(DA$v5) ## most of the variables failed the normality test.
+## Equal variance test
+X=as.matrix(DA[,2:5])
+Y=as.matrix(DA[,1])
+M=manova(X~Y)
+summary(M) ## P-value <0.05, we reject the Null hypothesis that our data is equal variance.
+#Plot Checking the Assumption of Equal Variance
+plot <- list()
+box_variables <- c("sex","v1","v2","v3","v4","v5")
+for(i in box_variables) {
+  plot[[i]] <- ggplot(DA, aes_string(x = "sex", y = i, col = "sex", fill = "sex")) + 
+    geom_boxplot(alpha = 0.2) + 
+    theme(legend.position = "none") + 
+    scale_color_manual(values = c("blue", "red", "green")) 
+  scale_fill_manual(values = c("blue", "red", "green"))
+}
+do.call(grid.arrange, c(plot, nrow = 1))
+##--------Data partition with the ratio of 7:3------------------------
+set.seed(105)
+DAdiv <- sample(2, nrow(DA),
+                replace = TRUE,
+                prob = c(0.7, 0.3))
+trainingset <- DA[DAdiv == 1,]
+testingset <- DA[DAdiv == 2,]
+#-----------------------------------------------
+#variable selections
+library(klaR)
+daforward <- greedy.wilks(sex~., data = trainingset, method = "lda")
+daforward
+da.fwd <- lda(daforward$formula, data = trainingset)
+da.fwd
+## trainning dataset
+prediction1 <- predict(da.fwd, trainingset)
+prediction1$class
+confusiontab.one <- table(Predicted = prediction1$class, Actual = trainingset$sex)
+confusiontab.one
+sum(diag(confusiontab.one))/sum(confusiontab.one)
+## testing dataset
+prediction2 <- predict(da.fwd, testingset)
+prediction2$class
+confusiontab2 <- table(Predicted = prediction2$class, Actual = testingset$sex)
+confusiontab2
+sum(diag(confusiontab2))/sum(confusiontab2)
 
+##--DA--For--Factors--for-Jobs
+job<-data$job
+v1<-data$MeaningAndEngagement
+v2<-data$Pleasure
+v3<-data$EnvironmentalConscious
+v4<-data$ThreeRs
+v5<-data$EnergyConservation
+DA <- data_frame(job,v1,v2,v3,v4,v5)
+DA$job=factor(DA$job)
+DA <- na.omit(DA)
+summary(DA)
+##--------Data partition with the ratio of 7:3------------------------
+set.seed(125)
+DAdiv <- sample(2, nrow(DA),
+                replace = TRUE,
+                prob = c(0.7, 0.3))
+trainingset <- DA[DAdiv == 1,]
+testingset <- DA[DAdiv == 2,]
+#-----------------------------------------------
+#variable selections
+library(klaR)
+daforward <- greedy.wilks(job~., data = trainingset, method = "lda")
+daforward
+da.fwd <- lda(daforward$formula, data = trainingset)
+da.fwd
+## trainning dataset
+prediction1 <- predict(da.fwd, trainingset)
+prediction1$class
+confusiontab.one <- table(Predicted = prediction1$class, Actual = trainingset$job)
+confusiontab.one
+sum(diag(confusiontab.one))/sum(confusiontab.one)
+## testing dataset
+prediction2 <- predict(da.fwd, testingset)
+prediction2$class
+confusiontab2 <- table(Predicted = prediction2$class, Actual = testingset$job)
+confusiontab2
+sum(diag(confusiontab2))/sum(confusiontab2)
 
+##--DA--For--Factors--for-Edu
+edu<-data$edu
+v1<-data$MeaningAndEngagement
+v2<-data$Pleasure
+v3<-data$EnvironmentalConscious
+v4<-data$ThreeRs
+v5<-data$EnergyConservation
+DA <- data_frame(edu,v1,v2,v3,v4,v5)
+DA$edu=factor(DA$edu)
+DA <- na.omit(DA)
+summary(DA)
+##--------Data partition with the ratio of 7:3------------------------
+set.seed(205)
+DAdiv <- sample(2, nrow(DA),
+                replace = TRUE,
+                prob = c(0.7, 0.3))
+trainingset <- DA[DAdiv == 1,]
+testingset <- DA[DAdiv == 2,]
+#-----------------------------------------------
+#variable selections
+library(klaR)
+daforward <- greedy.wilks(edu~., data = trainingset, method = "lda")
+daforward
+da.fwd <- lda(daforward$formula, data = trainingset)
+da.fwd
+## trainning dataset
+prediction1 <- predict(da.fwd, trainingset)
+prediction1$class
+confusiontab.one <- table(Predicted = prediction1$class, Actual = trainingset$edu)
+confusiontab.one
+sum(diag(confusiontab.one))/sum(confusiontab.one)
+## testing dataset
+prediction2 <- predict(da.fwd, testingset)
+prediction2$class
+confusiontab2 <- table(Predicted = prediction2$class, Actual = testingset$edu)
+confusiontab2
+sum(diag(confusiontab2))/sum(confusiontab2)
+
+##--DA--For sex--Using Entire Part1 
+sex<-data$sex
+part1<-data[3:20]
+DA <- data_frame(sex,part1)
+DA$sex=factor(DA$sex)
+DA <- na.omit(DA)
+summary(DA)
+##--------Data partition with the ratio of 7:3------------------------
+set.seed(230)
+DAdiv <- sample(2, nrow(DA),
+                replace = TRUE,
+                prob = c(0.7, 0.3))
+trainingset <- DA[DAdiv == 1,]
+testingset <- DA[DAdiv == 2,]
+#-----------------------------------------------
+#variable selections
+library(klaR)
+daforward <- greedy.wilks(sex~., data = trainingset, method = "lda")
+daforward
+da.fwd <- lda(daforward$formula, data = trainingset)
+da.fwd
+## trainning dataset
+prediction1 <- predict(da.fwd, trainingset)
+prediction1$class
+confusiontab.one <- table(Predicted = prediction1$class, Actual = trainingset$sex)
+confusiontab.one
+sum(diag(confusiontab.one))/sum(confusiontab.one)
+## testing dataset
+prediction2 <- predict(da.fwd, testingset)
+prediction2$class
+confusiontab2 <- table(Predicted = prediction2$class, Actual = testingset$sex)
+confusiontab2
+sum(diag(confusiontab2))/sum(confusiontab2)
+
+##--DA--For sex--Using Entire Part1 
+sex<-data$sex
+part1<-data[3:54]
+DA <- data_frame(sex,part1)
+DA$sex=factor(DA$sex)
+DA <- na.omit(DA)
+summary(DA)
+##--------Data partition with the ratio of 7:3------------------------
+set.seed(333)
+DAdiv <- sample(2, nrow(DA),
+                replace = TRUE,
+                prob = c(0.7, 0.3))
+trainingset <- DA[DAdiv == 1,]
+testingset <- DA[DAdiv == 2,]
+#-----------------------------------------------
+#variable selections
+library(klaR)
+daforward <- greedy.wilks(sex~., data = trainingset, method = "lda")
+daforward
+da.fwd <- lda(daforward$formula, data = trainingset)
+da.fwd
+## trainning dataset
+prediction1 <- predict(da.fwd, trainingset)
+prediction1$class
+confusiontab.one <- table(Predicted = prediction1$class, Actual = trainingset$sex)
+confusiontab.one
+sum(diag(confusiontab.one))/sum(confusiontab.one)
+## testing dataset
+prediction2 <- predict(da.fwd, testingset)
+prediction2$class
+confusiontab2 <- table(Predicted = prediction2$class, Actual = testingset$sex)
+confusiontab2
+sum(diag(confusiontab2))/sum(confusiontab2)
 
 #################################MCA#######################
 #### Data preparation
