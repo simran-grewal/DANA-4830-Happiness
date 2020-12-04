@@ -4,7 +4,7 @@ library(dplyr)
 library(GPArotation)
 library(stats)
 library(psych)
-library("factoextra")
+library(factoextra)
 library(corrplot)
 
 data <- read.csv('./Documents/Dimentionality Reduction/Group Project/Happiness-Sustainable-Behaviour.csv')
@@ -18,41 +18,9 @@ sum(is.na(data))
 #Data Dimensions
 dim(data)
 
-table(data$III.9.8)
-
-
 #Number of missing values in each row
 NAcol <- which(colSums(is.na(data)) > 0);NAcol
 sort(colSums(sapply(data[NAcol], is.na)), decreasing = TRUE)
-
-#Replacing the missing values with 0 becaue those homes don't have Hybrid car
-#4 value is out of range, will replace that with 0 as well because most of the homes don't have Hybrid car
-table(data$III.9.8)
-data$III.9.8 <- ifelse(is.na(data$III.9.8), 0, data$III.9.8)
-data$III.9.8 <- ifelse(data$III.9.8 != 1, 0, data$III.9.8)
-
-#Replacing the NA in flights with 0 becasue NAs means people haven't taken any flight this year
-table(data$flights)
-data$flights <- ifelse(is.na(data$flights), 0, data$flights)
-
-
-
-Not_attempted_q9 <- which(
-  is.na(data$III.9.2)
-  & is.na(data$III.9.3)
-  & is.na(data$III.9.4)
-  & is.na(data$III.9.5)
-  & is.na(data$III.9.6)
-  & is.na(data$III.9.1)
-  & is.na(data$III.9.7)
-)
-
-#Means 31 people completly skipped this questions
-length(Not_attempted_q9)
-
-data[c(Not_attempted_q9),"income"]
-table(data$income)
-
 
 #Removing SC_10 column because of unclear question and a lot of missing values
 data$SC_10 <- NULL
@@ -73,7 +41,7 @@ data[21:54] <- lapply(data[21:54], function(X) {
 sum(is.na(data[21:54]))
 
 
-#Repace missing values for each column in part 1 with maximum repeated values
+#Replace missing values for each column in part 1 with maximum repeated values
 replace_with_max_value <- function(x) {
   ux <- unique(x)
   return(ux[which.max(tabulate(match(x, ux)))])
@@ -90,7 +58,32 @@ data[,c(3:54)] <- lapply(data[3:54], getEachColumn)
 #No missing values for part 1 and part 2
 sum(is.na(data[,c(3:54)]))
 
+#Replacing the missing values with 0 becaue those homes don't have Hybrid car
+#4 value is out of range, will replace that with 0 as well because most of the homes don't have Hybrid car
+#table(data$III.9.8)
+#data$III.9.8 <- ifelse(is.na(data$III.9.8), 0, data$III.9.8)
+#data$III.9.8 <- ifelse(data$III.9.8 != 1, 0, data$III.9.8)
 
+#Replacing the NA in flights with 0 becasue NAs means people haven't taken any flight this year
+#table(data$flights)
+#data$flights <- ifelse(is.na(data$flights), 0, data$flights)
+
+Not_attempted_q9 <- which(
+  is.na(data$III.9.2)
+  & is.na(data$III.9.3)
+  & is.na(data$III.9.4)
+  & is.na(data$III.9.5)
+  & is.na(data$III.9.6)
+  & is.na(data$III.9.1)
+  & is.na(data$III.9.7)
+  & is.na(data$III.9.8)
+)
+
+#Means 28 people completly skipped this questions
+length(Not_attempted_q9)
+
+#data[c(Not_attempted_q9),"income"]
+#table(data$income)
 
 #Checking out of range values
 outOfRange <- lapply(data[3:54], function(X) {
@@ -186,9 +179,6 @@ pca_part2$scores
 eig.val <- get_eigenvalue(pca_part2)
 eig.val
 
-
-
-
 #####################################FA#####################################
 nofactors1 = fa.parallel(data[3:20], fm="ml", fa="fa")
 nofactors1$fa.values#eigen values
@@ -198,7 +188,6 @@ nofactors2$fa.values#eigen values
 
 sum(nofactors1$fa.values > 0.7) ##new kaiser criterion
 sum(nofactors2$fa.values > 0.7) ##new kaiser criterion
-
 
 
 ####FA part 1 ########
@@ -267,15 +256,14 @@ psych::alpha(data[ , f3p2])
 
 ###########Measuring factors #################
 
-
+#Part 1
 data$MeaningAndEngagement <- c(rowSums(data[,c("M11", "M14", "M02", "M12", "M05", "E04", "E09", "M17", "E07", "P13", "E01", "E10")])/12)
 data$Pleasure <- c(rowSums(data[,c("P15", "P03", "P18", "P16", "P08", "E06")])/6)
 
-
+#Part 2
 data$EnvironmentalConscious <- c(rowSums(data[, c("SC_4", "SC_13", "SC_19", "SC_18", "SC_17", "SC_3", "SC_12", "SC_14", "SC_9", "SC_20", "SC_1", "SC_16", "SC_11", "SC_2", "SC_15", "SC_31")])/16)
 data$ThreeRs <- c(rowSums(data[,c("SC_22", "SC_26", "SC_25", "SC_21", "SC_23", "SC_28", "SC_24")])/7)
 data$EnergyConservation <- c(rowSums(data[, c("SC_33", "SC_34", "SC_35", "SC_7", "SC_6", "SC_5", "SC_32", "SC_29", "SC_27", "SC_8")])/10)
-
 
 head(data)
 ################Regression Analysis ################
@@ -309,7 +297,6 @@ corrplot(M, method = "number", type = "upper")
 #It is clear from the correlation plot that none of the demographic variables have correlation with other 
 #variables, which means we cannot use any of the variables from demographic data as a response variable and cannot
 #do regression analysis for part 3 on this dataset
-
 
 #################################SR########################
 #Part 1: Independent variable; Part 2: Dependent Variable
@@ -438,8 +425,7 @@ lm.step.one.sb3 <- lm(EnergyConservation ~ MeaningAndEngagement, data = inliners
 library(QuantPsyc); lm.beta(lm.step.sb3)
 #MeaningAndEngagement = 0.58524790; Pleasure is removed
 
-#################################DA########################
-# Discriminant Analysis 
+##################DiscriminantAnalysis########################
 library(tidyverse)
 library(MASS)  #load the package for lda functions
 library(DiscriMiner) #load the package for lda functions
@@ -511,7 +497,7 @@ daforward <- greedy.wilks(sex~., data = trainingset, method = "lda")
 daforward
 da.fwd <- lda(daforward$formula, data = trainingset)
 da.fwd
-## trainning dataset
+## training dataset
 prediction1 <- predict(da.fwd, trainingset)
 prediction1$class
 confusiontab.one <- table(Predicted = prediction1$class, Actual = trainingset$sex)
@@ -549,7 +535,7 @@ daforward <- greedy.wilks(job~., data = trainingset, method = "lda")
 daforward
 da.fwd <- lda(daforward$formula, data = trainingset)
 da.fwd
-## trainning dataset
+## training dataset
 prediction1 <- predict(da.fwd, trainingset)
 prediction1$class
 confusiontab.one <- table(Predicted = prediction1$class, Actual = trainingset$job)
@@ -587,7 +573,7 @@ daforward <- greedy.wilks(edu~., data = trainingset, method = "lda")
 daforward
 da.fwd <- lda(daforward$formula, data = trainingset)
 da.fwd
-## trainning dataset
+## training dataset
 prediction1 <- predict(da.fwd, trainingset)
 prediction1$class
 confusiontab.one <- table(Predicted = prediction1$class, Actual = trainingset$edu)
@@ -621,7 +607,7 @@ daforward <- greedy.wilks(sex~., data = trainingset, method = "lda")
 daforward
 da.fwd <- lda(daforward$formula, data = trainingset)
 da.fwd
-## trainning dataset
+## training dataset
 prediction1 <- predict(da.fwd, trainingset)
 prediction1$class
 confusiontab.one <- table(Predicted = prediction1$class, Actual = trainingset$sex)
@@ -655,7 +641,7 @@ daforward <- greedy.wilks(sex~., data = trainingset, method = "lda")
 daforward
 da.fwd <- lda(daforward$formula, data = trainingset)
 da.fwd
-## trainning dataset
+## training dataset
 prediction1 <- predict(da.fwd, trainingset)
 prediction1$class
 confusiontab.one <- table(Predicted = prediction1$class, Actual = trainingset$sex)
@@ -711,7 +697,4 @@ fviz_ca_biplot(ca.mca,
 fviz_ca_col(ca.mca)
 ### plot rows-wise
 fviz_ca_row(ca.mca, repel = TRUE)# relationship between row points
-
-
-
 
