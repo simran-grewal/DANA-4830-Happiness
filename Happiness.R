@@ -144,7 +144,19 @@ cat("Number of rows left after removing outliers = ", dim(data)[1], " ")
 #Export Cleaned DataSet
 write.csv(data, "./Documents/Dimentionality Reduction/Group Project/CleanedDataFile.csv", row.names=FALSE)
 
+###################SummaryStatistics####################
+lapply(data[3:54], function(X) {
+  return(mean(X))
+})
+#min(X); max(X); sd(X)
 
+lapply(data[3:54], function(X) {
+  v <- paste("Mean = ", mean(X),
+             "Min = ", min(X),
+             "Max = ", max(X),
+             "SD = ", sd(X))
+  return(v)
+})
 
 ###############################PCA######################
 
